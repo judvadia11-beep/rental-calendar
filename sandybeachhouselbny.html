@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>SandyBeachHouseLBNY</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0d2137;--ocean:#16435e;--sky:#2176ae;--aqua:#3dbfb8;
+  --sand:#fdf8f2;--dune:#e4d9cc;--coral:#e05c4b;--gold:#c9922a;
+  --green:#1d7a4f;--ink:#1a252f;--slate:#607080;--mist:#edf4f9;--white:#fff;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;font-family:'Outfit',sans-serif;background:var(--sand);color:var(--ink);}
+
+/* TOP BAR */
+.topbar{background:var(--navy);padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px;position:sticky;top:0;z-index:60;box-shadow:0 3px 18px rgba(0,0,0,.35);}
+.brand-name{font-family:'Playfair Display',serif;font-size:1.05rem;color:#fff;white-space:nowrap;}
+.brand-sub{font-size:.58rem;color:var(--aqua);letter-spacing:.1em;text-transform:uppercase;margin-top:1px;}
+.nav-row{display:flex;align-items:center;gap:5px;}
+.arr{background:rgba(255,255,255,.12);border:none;color:#fff;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center;transition:background .18s;}
+.arr:hover{background:rgba(255,255,255,.25);}
+.mo-lbl{font-family:'Playfair Display',serif;font-size:.98rem;color:#fff;min-width:112px;text-align:center;}
+.top-btns{display:flex;gap:6px;}
+.tbtn{border:none;border-radius:18px;cursor:pointer;font-family:'Outfit',sans-serif;font-size:.68rem;font-weight:700;padding:6px 12px;letter-spacing:.04em;transition:all .18s;white-space:nowrap;}
+.tbtn-teal{background:var(--aqua);color:var(--navy);}
+.tbtn-teal:hover{background:#2eada6;}
+.tbtn-ghost{background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.25);}
+.tbtn-ghost:hover{background:rgba(255,255,255,.28);}
+
+/* STATS */
+.stats{background:var(--ocean);display:flex;overflow-x:auto;}
+.stat{flex:1;min-width:68px;padding:8px 5px;text-align:center;border-right:1px solid rgba(255,255,255,.1);}
+.stat:last-child{border-right:none;}
+.sv{font-family:'Playfair Display',serif;font-size:.95rem;color:var(--aqua);line-height:1;}
+.sl{font-size:.53rem;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:.07em;margin-top:3px;}
+
+/* LEGEND */
+.legend{background:var(--white);border-bottom:1px solid var(--dune);padding:6px 14px;display:flex;flex-wrap:wrap;gap:10px;}
+.li{display:flex;align-items:center;gap:4px;font-size:.64rem;font-weight:500;color:var(--slate);}
+.ld{width:9px;height:9px;border-radius:2px;flex-shrink:0;}
+
+/* CALENDAR */
+.cal-wrap{padding:8px 7px 90px;background:var(--mist);}
+.dow-row{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:3px;}
+.dow{text-align:center;font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--ocean);padding:3px 0;}
+.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;}
+
+.cell{background:var(--white);border-radius:8px;min-height:82px;padding:5px 4px;border:1.5px solid transparent;cursor:pointer;transition:border-color .15s,box-shadow .15s;overflow:hidden;}
+.cell:hover{border-color:var(--sky);box-shadow:0 2px 10px rgba(33,118,174,.15);}
+.cell.empty{background:transparent;border:none;pointer-events:none;}
+.cell.is-today{border-color:var(--aqua)!important;box-shadow:inset 0 0 0 1.5px var(--aqua);}
+.cell.is-weekend{background:#fdfbf8;}
+
+.dn{font-size:.72rem;font-weight:700;color:var(--ink);display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:2px;}
+.today-dot{background:var(--aqua);color:#fff;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.66rem;font-weight:700;flex-shrink:0;}
+.hol{font-size:.51rem;color:var(--coral);font-weight:700;text-transform:uppercase;letter-spacing:.04em;line-height:1.2;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+.stripe{height:4px;border-radius:2px;margin-bottom:3px;opacity:.35;}
+.stripe.vrbo{background:#3b82f6;}
+.stripe.airbnb{background:#e91e8c;}
+.stripe.direct{background:#27ae60;}
+
+.ev{border-radius:4px;padding:2px 5px;font-size:.57rem;font-weight:600;margin-bottom:2px;line-height:1.35;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;border-left:3px solid transparent;transition:opacity .15s;}
+.ev:hover{opacity:.75;}
+.ev.vrbo   {background:#dce8fc;color:#1a3e7a;border-color:#3b82f6;}
+.ev.airbnb {background:#fde3ef;color:#8b1645;border-color:#e91e8c;}
+.ev.direct {background:#d4f5e3;color:#155233;border-color:#27ae60;}
+.ev.clean  {background:#eaeef0;color:#3d5060;border-color:#8fa8b8;}
+.ev.blocked{background:#fde8e6;color:#8b1a1a;border-color:var(--coral);}
+.ev.note   {background:#fef6e0;color:#7a5c10;border-color:var(--gold);}
+
+/* BOTTOM NAV */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--navy);border-top:1px solid rgba(255,255,255,.1);display:flex;padding:8px 0 calc(8px + env(safe-area-inset-bottom));z-index:55;}
+.bnav{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:4px 0;font-size:.56rem;font-weight:600;color:rgba(255,255,255,.4);letter-spacing:.04em;text-transform:uppercase;transition:color .15s;}
+.bnav.active{color:var(--aqua);}
+.bnav .bi{font-size:1.15rem;}
+
+/* OVERLAYS */
+.overlay{display:none;position:fixed;inset:0;background:rgba(13,33,55,.65);z-index:200;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);}
+.overlay.open{display:flex;}
+.sheet{background:var(--white);width:100%;max-width:560px;border-radius:22px 22px 0 0;padding:0 18px calc(30px + env(safe-area-inset-bottom));max-height:92vh;overflow-y:auto;animation:up .28s cubic-bezier(.32,.72,0,1);}
+@keyframes up{from{transform:translateY(110%);}to{transform:translateY(0);}}
+.handle{width:40px;height:4px;background:var(--dune);border-radius:2px;margin:14px auto 18px;}
+.sh-title{font-family:'Playfair Display',serif;font-size:1.25rem;color:var(--navy);margin-bottom:16px;}
+
+.fg{margin-bottom:12px;}
+.fg label{display:block;font-size:.65rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--ocean);margin-bottom:4px;}
+.fg input,.fg select,.fg textarea{width:100%;border:1.5px solid var(--dune);border-radius:9px;padding:9px 12px;font-family:'Outfit',sans-serif;font-size:.88rem;color:var(--ink);background:var(--mist);outline:none;transition:border-color .2s;}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--sky);background:#fff;}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px;}
+.chip{border:2px solid var(--dune);border-radius:20px;padding:5px 12px;font-size:.7rem;font-weight:600;cursor:pointer;transition:all .15s;color:var(--slate);background:#fff;display:flex;align-items:center;gap:4px;}
+.chip.sel{border-color:var(--navy);color:var(--navy);background:var(--mist);}
+
+.btn-save{background:linear-gradient(135deg,var(--ocean),var(--sky));color:#fff;border:none;border-radius:11px;padding:12px;font-family:'Outfit',sans-serif;font-weight:700;font-size:.9rem;cursor:pointer;width:100%;margin-top:6px;letter-spacing:.02em;transition:opacity .2s;}
+.btn-save:hover{opacity:.88;}
+.btn-del{background:var(--coral);color:#fff;border:none;border-radius:11px;padding:10px;font-family:'Outfit',sans-serif;font-weight:700;font-size:.85rem;cursor:pointer;width:100%;margin-top:6px;}
+.btn-cancel{background:transparent;color:var(--slate);border:1.5px solid var(--dune);border-radius:11px;padding:10px;font-family:'Outfit',sans-serif;font-weight:600;font-size:.85rem;cursor:pointer;width:100%;margin-top:6px;}
+.btn-cancel:hover{border-color:var(--sky);color:var(--sky);}
+
+/* VIEW */
+.vbadge{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:14px;font-size:.66rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;}
+.vbadge.vrbo{background:#dce8fc;color:#1a3e7a;}
+.vbadge.airbnb{background:#fde3ef;color:#8b1645;}
+.vbadge.direct{background:#d4f5e3;color:#155233;}
+.vbadge.clean{background:#eaeef0;color:#3d5060;}
+.vbadge.blocked{background:#fde8e6;color:#8b1a1a;}
+.vbadge.note{background:#fef6e0;color:#7a5c10;}
+.vname{font-family:'Playfair Display',serif;font-size:1.5rem;color:var(--navy);margin-bottom:14px;line-height:1.2;}
+.vmoney{background:var(--mist);border-radius:12px;padding:13px;margin:12px 0;text-align:center;font-family:'Playfair Display',serif;font-size:2rem;color:var(--green);}
+.vmoney small{display:block;font-family:'Outfit',sans-serif;font-size:.62rem;color:var(--slate);letter-spacing:.1em;text-transform:uppercase;margin-top:2px;}
+.vrow{display:flex;align-items:center;gap:8px;font-size:.82rem;color:var(--slate);margin-bottom:8px;}
+.vrow strong{color:var(--ink);}
+
+/* BOOKINGS LIST */
+.bk-list{display:flex;flex-direction:column;gap:8px;}
+.bk-card{background:var(--white);border-radius:10px;padding:12px 14px;border:1.5px solid var(--dune);cursor:pointer;transition:border-color .15s;}
+.bk-card:hover{border-color:var(--sky);}
+.bk-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;}
+.bk-name{font-weight:700;font-size:.88rem;color:var(--navy);}
+.bk-amt{font-family:'Playfair Display',serif;font-size:1rem;color:var(--green);}
+.bk-meta{font-size:.72rem;color:var(--slate);margin-top:3px;}
+
+/* iCAL */
+.ical-box{background:var(--mist);border-radius:10px;padding:12px 14px;margin-bottom:12px;}
+.ical-box p{font-size:.78rem;color:var(--slate);line-height:1.6;margin-bottom:6px;}
+.ical-box strong{color:var(--navy);}
+.ical-notice{font-size:.75rem;padding:8px 12px;border-radius:8px;text-align:center;font-weight:600;margin-top:8px;}
+.ical-notice.ok{background:#d4f5e3;color:var(--green);}
+.ical-notice.warn{background:#fef6e0;color:#7a5c10;}
+.ical-notice.err{background:#fde8e6;color:#8b1a1a;}
+.divider{border:none;border-top:1px solid var(--dune);margin:16px 0;}
+
+/* SETUP GUIDE */
+.guide-step{display:flex;gap:12px;margin-bottom:16px;align-items:flex-start;}
+.gs-num{background:var(--ocean);color:#fff;width:26px;height:26px;border-radius:50%;font-size:.72rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.gs-body strong{display:block;font-size:.84rem;color:var(--navy);margin-bottom:3px;}
+.gs-body p{font-size:.76rem;color:var(--slate);line-height:1.55;}
+.gs-body code{background:var(--mist);border-radius:4px;padding:1px 5px;font-size:.72rem;color:var(--ocean);}
+
+@media(max-width:400px){
+  .cell{min-height:68px;padding:3px;}
+  .ev{font-size:.51rem;padding:2px 3px;}
+  .legend{gap:7px;font-size:.6rem;}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div>
+    <div class="brand-name">SandyBeachHouseLBNY</div>
+    <div class="brand-sub">🌊 Long Beach, New York</div>
+  </div>
+  <div class="nav-row">
+    <button class="arr" onclick="changeMonth(-1)">‹</button>
+    <div class="mo-lbl" id="moLbl"></div>
+    <button class="arr" onclick="changeMonth(1)">›</button>
+  </div>
+  <div class="top-btns">
+    <button class="tbtn tbtn-ghost" onclick="openIcal()">📥 iCal</button>
+    <button class="tbtn tbtn-teal" onclick="openAdd(null)">+ Add</button>
+  </div>
+</div>
+
+<div class="stats" id="stats"></div>
+
+<div class="legend">
+  <div class="li"><div class="ld" style="background:#3b82f6"></div>VRBO</div>
+  <div class="li"><div class="ld" style="background:#e91e8c"></div>Airbnb</div>
+  <div class="li"><div class="ld" style="background:#27ae60"></div>Direct</div>
+  <div class="li"><div class="ld" style="background:#8fa8b8"></div>Clean/Reset</div>
+  <div class="li"><div class="ld" style="background:var(--coral)"></div>Blocked</div>
+  <div class="li"><div class="ld" style="background:var(--gold)"></div>Note</div>
+  <div class="li"><div class="ld" style="background:var(--coral);border-radius:50%"></div>Holiday</div>
+</div>
+
+<div class="cal-wrap">
+  <div class="dow-row">
+    <div class="dow">Sun</div><div class="dow">Mon</div><div class="dow">Tue</div>
+    <div class="dow">Wed</div><div class="dow">Thu</div><div class="dow">Fri</div>
+    <div class="dow">Sat</div>
+  </div>
+  <div class="grid" id="grid"></div>
+</div>
+
+<div class="bottom-nav">
+  <div class="bnav active" id="bnav-cal" onclick="setTab('cal')"><span class="bi">📅</span><span>Calendar</span></div>
+  <div class="bnav" id="bnav-list" onclick="setTab('list')"><span class="bi">📋</span><span>Bookings</span></div>
+  <div class="bnav" id="bnav-add" onclick="openAdd(null)"><span class="bi">➕</span><span>Add</span></div>
+  <div class="bnav" id="bnav-setup" onclick="openSetup()"><span class="bi">⚙️</span><span>Setup</span></div>
+</div>
+
+<!-- ── ADD / EDIT SHEET ── -->
+<div class="overlay" id="addOv" onclick="closeOv('addOv')">
+  <div class="sheet" onclick="event.stopPropagation()">
+    <div class="handle"></div>
+    <div class="sh-title" id="addTitle">New Entry</div>
+    <div class="chips" id="typeChips">
+      <div class="chip sel" data-t="vrbo"    onclick="pickType('vrbo')">🏠 VRBO</div>
+      <div class="chip"     data-t="airbnb"  onclick="pickType('airbnb')">🌸 Airbnb</div>
+      <div class="chip"     data-t="direct"  onclick="pickType('direct')">🤝 Direct</div>
+      <div class="chip"     data-t="clean"   onclick="pickType('clean')">🧹 Clean</div>
+      <div class="chip"     data-t="blocked" onclick="pickType('blocked')">🚫 Blocked</div>
+      <div class="chip"     data-t="note"    onclick="pickType('note')">📝 Note</div>
+    </div>
+    <div id="gSec">
+      <div class="fg"><label>Guest Name</label><input id="fName" type="text" placeholder="First Last"></div>
+      <div class="fr">
+        <div class="fg"><label>Check-In</label><input id="fIn" type="date"></div>
+        <div class="fg"><label>Check-Out</label><input id="fOut" type="date"></div>
+      </div>
+      <div class="fr">
+        <div class="fg"><label>Amount ($)</label><input id="fAmt" type="number" placeholder="0.00" step="0.01"></div>
+        <div class="fg"><label>Confirmation #</label><input id="fConf" type="text" placeholder="Optional"></div>
+      </div>
+      <div class="fg"><label>Notes</label><input id="fNote" type="text" placeholder="Pets, requests, contact…"></div>
+    </div>
+    <div id="bSec" style="display:none">
+      <div class="fr">
+        <div class="fg"><label>Start Date</label><input id="fBS" type="date"></div>
+        <div class="fg"><label>End Date</label><input id="fBE" type="date"></div>
+      </div>
+      <div class="fg"><label>Label</label><input id="fBL" type="text" placeholder="e.g. Clean & Reset, Personal Use"></div>
+    </div>
+    <button class="btn-save" onclick="saveEntry()">Save</button>
+    <button class="btn-cancel" onclick="closeOv('addOv')">Cancel</button>
+  </div>
+</div>
+
+<!-- ── VIEW SHEET ── -->
+<div class="overlay" id="viewOv" onclick="closeOv('viewOv')">
+  <div class="sheet" onclick="event.stopPropagation()">
+    <div class="handle"></div>
+    <div id="viewContent"></div>
+    <button class="btn-save" onclick="editCurrent()">✏️ Edit</button>
+    <button class="btn-del" onclick="deleteCurrent()">Delete</button>
+    <button class="btn-cancel" onclick="closeOv('viewOv')">Close</button>
+  </div>
+</div>
+
+<!-- ── BOOKINGS LIST SHEET ── -->
+<div class="overlay" id="listOv" onclick="closeOv('listOv')">
+  <div class="sheet" onclick="event.stopPropagation()">
+    <div class="handle"></div>
+    <div class="sh-title">All Bookings</div>
+    <div id="listContent"></div>
+    <button class="btn-cancel" onclick="closeOv('listOv')">Close</button>
+  </div>
+</div>
+
+<!-- ── iCAL SHEET ── -->
+<div class="overlay" id="icalOv" onclick="closeOv('icalOv')">
+  <div class="sheet" onclick="event.stopPropagation()">
+    <div class="handle"></div>
+    <div class="sh-title">📥 Import from Airbnb / VRBO</div>
+    <div class="ical-box">
+      <p><strong>Airbnb:</strong> Go to your listing → Calendar → Availability → scroll to "Export Calendar" → copy the link.</p>
+      <p><strong>VRBO:</strong> Go to your listing → Calendar → Import/Export → Export → copy the .ics link.</p>
+    </div>
+    <div class="fg"><label>Airbnb iCal URL</label><input id="iAirbnb" type="url" placeholder="https://www.airbnb.com/calendar/ical/…"></div>
+    <div class="fg"><label>VRBO iCal URL</label><input id="iVrbo" type="url" placeholder="https://www.vrbo.com/icalendar/…"></div>
+    <button class="btn-save" onclick="runImport()">Import Now</button>
+    <div id="icalStatus"></div>
+    <div class="divider"></div>
+    <p style="font-size:.72rem;color:var(--slate);line-height:1.6;"><strong style="color:var(--navy)">💡 Tip:</strong> Tap "Import Now" whenever you want to sync fresh bookings. Your manually added entries are always kept.</p>
+    <button class="btn-cancel" onclick="closeOv('icalOv')">Done</button>
+  </div>
+</div>
+
+<!-- ── SETUP / HOW-TO SHEET ── -->
+<div class="overlay" id="setupOv" onclick="closeOv('setupOv')">
+  <div class="sheet" onclick="event.stopPropagation()">
+    <div class="handle"></div>
+    <div class="sh-title">⚙️ Setup Guide</div>
+    <p style="font-size:.78rem;color:var(--slate);margin-bottom:16px;line-height:1.6;">How to use this calendar on <strong style="color:var(--navy)">any device</strong> — phone, tablet, or computer — so it's always with you.</p>
+
+    <div class="guide-step">
+      <div class="gs-num">1</div>
+      <div class="gs-body">
+        <strong>Save this file somewhere permanent</strong>
+        <p>Download this HTML file and save it to <code>Google Drive</code>, <code>Dropbox</code>, or <code>iCloud Drive</code>. That way it's backed up and accessible from anywhere.</p>
+      </div>
+    </div>
+    <div class="guide-step">
+      <div class="gs-num">2</div>
+      <div class="gs-body">
+        <strong>Open it in your browser</strong>
+        <p>On your phone: open the Google Drive / Dropbox app → tap the file → tap "Open in browser." On your computer: just double-click the file to open it in Chrome, Safari, or Edge.</p>
+      </div>
+    </div>
+    <div class="guide-step">
+      <div class="gs-num">3</div>
+      <div class="gs-body">
+        <strong>Add to your phone's home screen (iPhone)</strong>
+        <p>Open the file in Safari → tap the Share button (box with arrow) → tap <code>Add to Home Screen</code> → tap Add. It will appear like an app icon.</p>
+      </div>
+    </div>
+    <div class="guide-step">
+      <div class="gs-num">4</div>
+      <div class="gs-body">
+        <strong>Add to home screen (Android)</strong>
+        <p>Open in Chrome → tap the 3-dot menu → tap <code>Add to Home Screen</code>. Done — opens like an app.</p>
+      </div>
+    </div>
+    <div class="guide-step">
+      <div class="gs-num">5</div>
+      <div class="gs-body">
+        <strong>Sync your Airbnb & VRBO bookings</strong>
+        <p>Tap the <code>📥 iCal</code> button, paste your export links from each platform, tap Import. Repeat anytime you want fresh data. Your manual entries are never overwritten.</p>
+      </div>
+    </div>
+    <div class="guide-step">
+      <div class="gs-num">6</div>
+      <div class="gs-body">
+        <strong>Keep a master copy in Google Drive</strong>
+        <p>Since entries are stored in the file itself while you use it, download/save an updated copy to Google Drive periodically so you never lose data if you switch devices.</p>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+    <p style="font-size:.72rem;color:var(--slate);line-height:1.6;"><strong style="color:var(--navy)">No account needed.</strong> This calendar works entirely in your browser — nothing is sent to any server. Your data stays with you.</p>
+    <button class="btn-cancel" onclick="closeOv('setupOv')">Got It</button>
+  </div>
+</div>
+
+<script>
+// ── HOLIDAYS ──────────────────────────────────────────
+const HOL={
+  '2025-01-01':"New Year's Day",'2025-01-20':'MLK Day','2025-02-17':"Presidents' Day",
+  '2025-05-26':'Memorial Day','2025-06-19':'Juneteenth','2025-07-04':'Independence Day',
+  '2025-09-01':'Labor Day','2025-10-13':'Columbus Day','2025-11-11':"Veterans' Day",
+  '2025-11-27':'Thanksgiving','2025-12-25':'Christmas',
+  '2026-01-01':"New Year's Day",'2026-01-19':'MLK Day','2026-02-16':"Presidents' Day",
+  '2026-05-25':'Memorial Day','2026-06-19':'Juneteenth','2026-07-04':'Independence Day',
+  '2026-09-07':'Labor Day','2026-10-12':'Columbus Day','2026-11-11':"Veterans' Day",
+  '2026-11-26':'Thanksgiving','2026-12-25':'Christmas',
+  '2027-01-01':"New Year's Day",'2027-01-18':'MLK Day','2027-02-15':"Presidents' Day",
+  '2027-05-31':'Memorial Day','2027-06-19':'Juneteenth','2027-07-04':'Independence Day',
+  '2027-09-06':'Labor Day','2027-11-11':"Veterans' Day",'2027-11-25':'Thanksgiving','2027-12-25':'Christmas',
+};
+
+// ── STATE ─────────────────────────────────────────────
+let Y=2026,M=5; // June 2026
+let selType='vrbo',editId=null,viewId=null;
+
+let ENTRIES=[
+  {id:'j1',type:'vrbo',  name:'Lacy Haguewood',checkin:'2026-06-18',checkout:'2026-06-21',amount:3590.88,conf:'',notes:''},
+  {id:'j2',type:'vrbo',  name:'Thomas Feerick', checkin:'2026-06-24',checkout:'2026-06-28',amount:4690.83,conf:'',notes:''},
+  {id:'j3',type:'clean', name:'Clean & Reset',  checkin:'2026-06-22',checkout:'2026-06-22',amount:0,conf:'',notes:''},
+  {id:'j4',type:'clean', name:'Clean & Reset',  checkin:'2026-06-29',checkout:'2026-06-29',amount:0,conf:'',notes:''},
+];
+
+const MO=['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+// ── UTILS ─────────────────────────────────────────────
+const pad=n=>String(n).padStart(2,'0');
+const ds=(y,m,d)=>`${y}-${pad(m+1)}-${pad(d)}`;
+const parseD=s=>{const[y,m,d]=s.split('-');return new Date(+y,+m-1,+d);};
+const nts=(a,b)=>Math.max(0,Math.round((parseD(b)-parseD(a))/86400000));
+const fmt$=n=>n?'$'+Number(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}):'';
+const isToday=(y,m,d)=>{const t=new Date();return t.getFullYear()===y&&t.getMonth()===m&&t.getDate()===d;};
+const uid=()=>'e'+Date.now()+Math.random().toString(36).slice(2,5);
+const tLbl=t=>({vrbo:'VRBO',airbnb:'Airbnb',direct:'Direct',clean:'Clean & Reset',blocked:'Blocked',note:'Note'}[t]||t);
+
+function onDay(dstr){
+  return ENTRIES.filter(e=>e.checkin&&e.checkout&&dstr>=e.checkin&&dstr<=e.checkout);
+}
+
+// ── RENDER ────────────────────────────────────────────
+function render(){
+  document.getElementById('moLbl').textContent=`${MO[M]} ${Y}`;
+  const dim=new Date(Y,M+1,0).getDate();
+
+  // Stats for this month
+  let rev=0,bkN=0,bkC=0,clC=0;
+  ENTRIES.forEach(e=>{
+    if(!e.checkin) return;
+    const ci=parseD(e.checkin);
+    if(ci.getFullYear()===Y&&ci.getMonth()===M){
+      if(['vrbo','airbnb','direct'].includes(e.type)){rev+=parseFloat(e.amount)||0;bkN+=nts(e.checkin,e.checkout);bkC++;}
+      if(e.type==='clean') clC++;
+    }
+  });
+  document.getElementById('stats').innerHTML=
+    `<div class="stat"><div class="sv">${fmt$(rev)||'$0'}</div><div class="sl">Revenue</div></div>`+
+    `<div class="stat"><div class="sv">${bkC}</div><div class="sl">Bookings</div></div>`+
+    `<div class="stat"><div class="sv">${bkN}</div><div class="sl">Nights</div></div>`+
+    `<div class="stat"><div class="sv">${Math.round(bkN/dim*100)}%</div><div class="sl">Occupancy</div></div>`+
+    `<div class="stat"><div class="sv">${clC}</div><div class="sl">Cleans</div></div>`;
+
+  // Grid
+  const grid=document.getElementById('grid');
+  grid.innerHTML='';
+  const fd=new Date(Y,M,1).getDay();
+  for(let i=0;i<fd;i++){const e=document.createElement('div');e.className='cell empty';grid.appendChild(e);}
+
+  for(let d=1;d<=dim;d++){
+    const dstr=ds(Y,M,d);
+    const dow=new Date(Y,M,d).getDay();
+    const cell=document.createElement('div');
+    let cls='cell';
+    if(isToday(Y,M,d)) cls+=' is-today';
+    if(dow===0||dow===6) cls+=' is-weekend';
+    cell.className=cls;
+    cell.onclick=()=>openAdd(dstr);
+
+    // Number
+    const dn=document.createElement('div');
+    dn.className='dn';
+    dn.innerHTML=isToday(Y,M,d)?`<span class="today-dot">${d}</span>`:d;
+    cell.appendChild(dn);
+
+    // Holiday
+    if(HOL[dstr]){const h=document.createElement('div');h.className='hol';h.textContent=HOL[dstr];cell.appendChild(h);}
+
+    // Events
+    const evts=onDay(dstr);
+    const shown=new Set();
+    evts.forEach(e=>{
+      if(shown.has(e.id)) return;
+      shown.add(e.id);
+      const isCI=e.checkin===dstr,isCO=e.checkout===dstr;
+      const isMid=['vrbo','airbnb','direct'].includes(e.type)&&!isCI&&!isCO;
+
+      if(isMid){
+        const s=document.createElement('div');
+        s.className=`stripe ${e.type}`;
+        cell.appendChild(s);
+        return;
+      }
+      const pill=document.createElement('div');
+      pill.className=`ev ${e.type}`;
+      let lbl='';
+      if(['clean','blocked','note'].includes(e.type)){
+        lbl=e.name||tLbl(e.type);
+      } else {
+        lbl=(isCI?'▶ ':isCO?'◀ ':'— ')+(e.name||tLbl(e.type));
+        if(isCI&&e.amount) lbl+=` ${fmt$(e.amount)}`;
+      }
+      pill.textContent=lbl;
+      pill.title=`${e.name||tLbl(e.type)}\n${e.checkin} → ${e.checkout}\n${fmt$(e.amount)}`;
+      pill.onclick=(ev)=>{ev.stopPropagation();openView(e.id);};
+      cell.appendChild(pill);
+    });
+    grid.appendChild(cell);
+  }
+}
+
+function changeMonth(d){M+=d;if(M>11){M=0;Y++;}if(M<0){M=11;Y--;}render();}
+
+// ── OVERLAYS ──────────────────────────────────────────
+function closeOv(id){document.getElementById(id).classList.remove('open');}
+function openOv(id){document.getElementById(id).classList.add('open');}
+
+// ── ADD / EDIT ────────────────────────────────────────
+function openAdd(pre){
+  editId=null;
+  document.getElementById('addTitle').textContent='New Entry';
+  ['fName','fIn','fOut','fAmt','fConf','fNote','fBS','fBE','fBL'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.value=['fIn','fOut','fBS','fBE'].includes(id)?pre||'':'';
+  });
+  pickType('vrbo');
+  openOv('addOv');
+}
+
+function pickType(t){
+  selType=t;
+  document.querySelectorAll('#typeChips .chip').forEach(c=>c.classList.toggle('sel',c.dataset.t===t));
+  const isB=['clean','blocked','note'].includes(t);
+  document.getElementById('gSec').style.display=isB?'none':'block';
+  document.getElementById('bSec').style.display=isB?'block':'none';
+}
+
+function saveEntry(){
+  const t=selType;
+  let entry={id:editId||uid(),type:t};
+  if(['clean','blocked','note'].includes(t)){
+    entry.checkin=document.getElementById('fBS').value;
+    entry.checkout=document.getElementById('fBE').value||entry.checkin;
+    entry.name=document.getElementById('fBL').value||tLbl(t);
+    entry.amount=0;entry.conf='';entry.notes='';
+  } else {
+    entry.name=document.getElementById('fName').value;
+    entry.checkin=document.getElementById('fIn').value;
+    entry.checkout=document.getElementById('fOut').value;
+    entry.amount=parseFloat(document.getElementById('fAmt').value)||0;
+    entry.conf=document.getElementById('fConf').value;
+    entry.notes=document.getElementById('fNote').value;
+  }
+  if(!entry.checkin){alert('Please set a date.');return;}
+  if(editId){const i=ENTRIES.findIndex(e=>e.id===editId);if(i>-1)ENTRIES[i]=entry;}
+  else ENTRIES.push(entry);
+  closeOv('addOv');render();
+}
+
+// ── VIEW ──────────────────────────────────────────────
+function openView(id){
+  viewId=id;
+  const e=ENTRIES.find(x=>x.id===id);if(!e)return;
+  const n=nts(e.checkin,e.checkout||e.checkin);
+  let h=`<span class="vbadge ${e.type}">${tLbl(e.type)}</span>`;
+  h+=`<div class="vname">${e.name||tLbl(e.type)}</div>`;
+  if(e.amount>0) h+=`<div class="vmoney">${fmt$(e.amount)}<small>Total Amount</small></div>`;
+  if(e.checkin) h+=`<div class="vrow">📅 <span><strong>Check-in:</strong> ${e.checkin}</span></div>`;
+  if(e.checkout&&e.checkout!==e.checkin) h+=`<div class="vrow">📅 <span><strong>Check-out:</strong> ${e.checkout}</span></div>`;
+  if(n>0) h+=`<div class="vrow">🌙 <strong>${n} night${n!==1?'s':''}</strong></div>`;
+  if(e.conf) h+=`<div class="vrow">🔖 <span><strong>Conf #:</strong> ${e.conf}</span></div>`;
+  if(e.notes) h+=`<div class="vrow">📝 <span>${e.notes}</span></div>`;
+  document.getElementById('viewContent').innerHTML=h;
+  closeOv('addOv');openOv('viewOv');
+}
+
+function editCurrent(){
+  const e=ENTRIES.find(x=>x.id===viewId);if(!e)return;
+  closeOv('viewOv');editId=e.id;
+  document.getElementById('addTitle').textContent='Edit Entry';
+  pickType(e.type);
+  if(['clean','blocked','note'].includes(e.type)){
+    document.getElementById('fBS').value=e.checkin||'';
+    document.getElementById('fBE').value=e.checkout||'';
+    document.getElementById('fBL').value=e.name||'';
+  } else {
+    document.getElementById('fName').value=e.name||'';
+    document.getElementById('fIn').value=e.checkin||'';
+    document.getElementById('fOut').value=e.checkout||'';
+    document.getElementById('fAmt').value=e.amount||'';
+    document.getElementById('fConf').value=e.conf||'';
+    document.getElementById('fNote').value=e.notes||'';
+  }
+  openOv('addOv');
+}
+
+function deleteCurrent(){
+  if(confirm('Delete this entry?')){ENTRIES=ENTRIES.filter(e=>e.id!==viewId);closeOv('viewOv');render();}
+}
+
+// ── BOOKINGS LIST ─────────────────────────────────────
+function setTab(v){
+  ['cal','list','add','setup'].forEach(t=>document.getElementById('bnav-'+t)?.classList.remove('active'));
+  if(v==='cal'){document.getElementById('bnav-cal').classList.add('active');}
+  if(v==='list'){
+    document.getElementById('bnav-list').classList.add('active');
+    const sorted=[...ENTRIES].filter(e=>['vrbo','airbnb','direct'].includes(e.type)).sort((a,b)=>a.checkin>b.checkin?1:-1);
+    document.getElementById('listContent').innerHTML=sorted.length?
+      '<div class="bk-list">'+sorted.map(e=>`
+        <div class="bk-card" onclick="closeOv('listOv');openView('${e.id}')">
+          <div class="bk-top"><span class="bk-name">${e.name||'Guest'}</span><span class="bk-amt">${fmt$(e.amount)}</span></div>
+          <div class="bk-meta"><span class="vbadge ${e.type}" style="font-size:.6rem;padding:2px 8px;margin-bottom:0;">${tLbl(e.type)}</span> &nbsp;${e.checkin} → ${e.checkout} · ${nts(e.checkin,e.checkout)} nights</div>
+        </div>`).join('')+'</div>':
+      '<p style="color:var(--slate);font-size:.85rem;padding:24px 0;text-align:center;">No bookings yet.</p>';
+    openOv('listOv');
+  }
+}
+
+// ── iCAL IMPORT ───────────────────────────────────────
+function openIcal(){openOv('icalOv');}
+
+async function runImport(){
+  const aUrl=document.getElementById('iAirbnb').value.trim();
+  const vUrl=document.getElementById('iVrbo').value.trim();
+  const statusEl=document.getElementById('icalStatus');
+  if(!aUrl&&!vUrl){statusEl.innerHTML='<div class="ical-notice warn">Paste at least one iCal URL above.</div>';return;}
+  statusEl.innerHTML='<div class="ical-notice" style="background:#dce8fc;color:#1a3e7a;">⏳ Importing…</div>';
+  let imported=0,errs=[];
+  const tasks=[];
+  if(aUrl) tasks.push({url:aUrl,src:'airbnb'});
+  if(vUrl) tasks.push({url:vUrl,src:'vrbo'});
+  for(const t of tasks){
+    try{
+      const proxy=`https://api.allorigins.win/raw?url=${encodeURIComponent(t.url)}`;
+      const res=await fetch(proxy);
+      if(!res.ok) throw new Error();
+      const txt=await res.text();
+      const parsed=parseIcal(txt,t.src);
+      ENTRIES=ENTRIES.filter(e=>e.icalSrc!==t.src);
+      ENTRIES.push(...parsed);
+      imported+=parsed.length;
+    }catch{errs.push(t.src);}
+  }
+  statusEl.innerHTML=errs.length?
+    `<div class="ical-notice err">⚠️ Could not reach: ${errs.join(', ')}. The iCal URL may have expired — regenerate it from the platform and try again.</div>`:
+    `<div class="ical-notice ok">✅ Imported ${imported} entries successfully!</div>`;
+  render();
+}
+
+function parseIcal(text,src){
+  const evts=[];
+  text.split('BEGIN:VEVENT').slice(1).forEach(blk=>{
+    const get=k=>{const m=blk.match(new RegExp(k+'(?:;[^:]+)?:([^\\r\\n]+)'));return m?m[1].trim():'';};
+    const fmtD=r=>{const s=r.replace(/T.*/,'');return s.length===8?`${s.slice(0,4)}-${s.slice(4,6)}-${s.slice(6,8)}`:s;};
+    const ci=fmtD(get('DTSTART')),co=fmtD(get('DTEND'))||ci,sum=get('SUMMARY'),uid_=get('UID');
+    if(!ci) return;
+    const isBlk=/not available|blocked|unavailable/i.test(sum);
+    evts.push({id:'ic_'+uid_,type:isBlk?'blocked':src,name:isBlk?'Blocked':sum||'Guest',checkin:ci,checkout:co,amount:0,conf:'',notes:'',icalSrc:src});
+  });
+  return evts;
+}
+
+// ── SETUP ─────────────────────────────────────────────
+function openSetup(){openOv('setupOv');}
+
+// ── INIT ──────────────────────────────────────────────
+render();
+</script>
+</body>
+</html>
